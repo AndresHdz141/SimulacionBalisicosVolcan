@@ -12,6 +12,7 @@ end
 
 #Agregar funcion de densidad del aire respecto a la altura (Barometric formula)
 
+
 #En caso de ser posible/tiempo añadir comportamiento de solidificacion del proyectil respecto a tiempo 
 #(debido a que la explosion lanza magma viscoza que se enfría y solidifica), lo que cambia el arrastre que experimenta.
 
