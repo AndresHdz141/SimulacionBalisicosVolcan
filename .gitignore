@@ -17,8 +17,12 @@ JuliaLocalPreferences.toml
 # ==========================================
 # 2. Simulation Results & Large Files
 # ==========================================
-data/outputs/*
-!data/outputs/.gitkeep
+data/output/*
+!data/output/.gitkeep
+!data/input/.gitkeep
+!scripts/.gitkeep
+
+
 
 # ==========================================
 # 3. System & Editor Junk Files
