@@ -2,6 +2,16 @@ module Physics
 include("Objects.jl") #Incluye los data structs del archivo "Objects.jl"
 using VolcanicProyectile, Environment #Se utilizan los structs VolcanicProyectile y Environment
 
+
+function initial_data_producer(obj::VolcanicProyectile, env::Environment)
+
+    #checa que las velocidades iniciales y masas sean coherentes para un proyectil usando energias
+    
+end
+
+
+
+
 function acceleration(obj::VolcanicProyectile, env::Environment)
 
 #=
