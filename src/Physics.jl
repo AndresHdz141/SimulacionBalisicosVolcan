@@ -1,9 +1,9 @@
 module Physics
 include("Objects.jl") #Incluye los data structs del archivo "Objects.jl"
-using VolcanicProyectile, Environment #Se utilizan los structs VolcanicProyectile y Environment
+using VolcanicProjectile, Environment #Se utilizan los structs VolcanicProyectile y Environment
 
 
-function initial_data_producer(obj::VolcanicProyectile, env::Environment)
+function initial_data_producer(obj::VolcanicProjectile, env::Environment)
 
     #checa que las velocidades iniciales y masas sean coherentes para un proyectil usando energias
     
@@ -12,7 +12,7 @@ end
 
 
 
-function acceleration(obj::VolcanicProyectile, env::Environment)
+function acceleration(obj::VolcanicProjectile, env::Environment)
 
 #=
 Añadir la logica de la aceleracion para el tipo de particula VolcanicProyectile en un ambiente Environment.
@@ -21,7 +21,7 @@ Añadir la logica de la aceleracion para el tipo de particula VolcanicProyectile
 end
 
 #Agregar funcion de densidad del aire respecto a la altura (Barometric formula)
-function AirDensity(obj::VolcanicProyectile, env::Environment)
+function AirDensity(obj::VolcanicProjectile, env::Environment)
 
 end
 
