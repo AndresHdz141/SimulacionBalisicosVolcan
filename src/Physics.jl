@@ -12,7 +12,7 @@ end
 
 
 
-function acceleration(obj::VolcanicProjectile, env::Environment)
+function aceleracion(obj::VolcanicProjectile, env::Environment, velocity::SVector)
 
 #=
 Añadir la logica de la aceleracion para el tipo de particula VolcanicProyectile en un ambiente Environment.
@@ -21,13 +21,18 @@ Añadir la logica de la aceleracion para el tipo de particula VolcanicProyectile
 end
 
 #Agregar funcion de densidad del aire respecto a la altura (Barometric formula)
-function AirDensity(obj::VolcanicProjectile, env::Environment)
-
+function DensidadAire(obj::VolcanicProjectile, env::Environment)
+return env.rho0 * exp((-env.M * norm(env.g) * obj.pos[3])/(env.R * env.T0))
 end
 
-#En caso de ser posible/tiempo añadir comportamiento de solidificacion del proyectil respecto a tiempo 
-#(debido a que la explosion lanza magma viscoza que se enfría y solidifica), lo que cambia el arrastre que experimenta.
+#FUERZAS----------------
 
+function ForceGravity(obj::VolcanicProjectile, env::Environment)
+    return obj.mass .* env.g
+end
 
+function ForceDrag(obj::VolcanicProjectile, env::Environment)
+    rho = DensidadAire(obj, env)
+    return (1/(2*obj.masa)) * rho * obj.area * norm(obj.v) ^ 2 * obj.ca
 
 end

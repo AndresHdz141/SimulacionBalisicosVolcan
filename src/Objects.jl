@@ -13,66 +13,66 @@ struct Eruption
 
     max_KE::Float64 #J
 
-    Cantidad_pr::Int
+    Cantidad_pr::Int #n proyectiles
 
 end
 
 #erupciones-------
 
-const debil = Eruption("debil", 110, 150, 1.3e6, 1000)
+const debil = Eruption("debil", 110.0, 150.0, 1.3e6, 1000)
 
-const media = Eruption("media", 120, 160, 1.0e7, 1000)
+const media = Eruption("media", 120.0, 160.0, 1.0e7, 1000)
 
-const fuerte = Eruption("fuerte", 180, 230, 8.9e7,1000)
+const fuerte = Eruption("fuerte", 180.0, 230.0, 8.9e7, 1000)
+
 #----
 
 #Caracteristicas del proyectil - posicion, velocidad en x,y,z | 
 Base.@kwdef mutable struct VolcanicProjectile 
 
     #Añadir las caracteristicas y variables necesarias para el comportamiento del proyectil
-    ca::Float64
+    ca::Float64     
 
-    rad::Float64
-    dens::Float64
-    masa::Float64
-    area::Float64
+    rad::Float64        #m
+    dens::Float64       #kg/m^3
+    masa::Float64       #m
+    area::Float64       #m^2
 
-    speed::Float64
-    theta::Float64             #angulo Horizontal 0 a 360
-    phi::Float64                #angulo vertical 30 a 80
+    theta::Float64      #angulo Horizontal 0 a 360
+    phi::Float64        #angulo vertical 30 a 90
 
-    pos::Vector{Float64}
-    vel::Vector{Float64}
-
+    #Para optimizar se usa SVector que crea un vector con 3 espacios.
+    pos::SVector{3, Float64}    #m
+    vel::SVector{3, Float64}    #m/s
+    acc::SVector{3, Float64}    #m/s^2
 
 end
 
 
 
-Base.@kwdef struct Environment #Caracteristicas del ambiente
-    #Añadir caracteristicas importantes
-    height::Float64 = 3218.0
-    height_volcano::Float64 = 5426.0
-    latitud::Float64 = 19
+Base.@kwdef struct Environment #Caracteristicas del ambiente 
+    #Añadir caracteristicas importantes - msnm = metros sobre nivel del mar
+    
+    altura_base::Float64       #msnm
+    altura_crater::Float64     #msnm
+    latitud::Float64           #°
 
-    temp_cima::Float64 = -2
-    temp_int::Float64 = 950
-    humid::Float64 = 68  #%
+    temp_cima::Float64 = -2    #°C
+    temp_int::Float64 = 950    #°C
+    humedad_rel::Float64 = 68  #%
 
-    g::Float64 = 9.81
+    g::SVector{3, Float64}(0.0, 0.0, -9.81) #m/s^2
 
-    L::Float64 = 0.0065  # K/m
-    M::Float64 = 0.0289644  # kg/mol
-    R::Float64 = 8.3144598  # J/(mol K)
-    T0::Float64 = 288.15  # K
-    P0::Float64 = 101325  # Pa
+    L::Float64 = 0.0065        # K/m
+    M::Float64 = 0.0289644     # kg/mol
+    R::Float64 = 8.3144598     # J/(mol K)
+    T0::Float64 = 288.15       # K
+    rho0::Float64 = 1.225       #kg/m^3
 
-    #wind
+    #wind - se considera constante porque no podemos asumir un gradiente sin datos
 
     wind_ref_sp::Float64 = 0.0     #m/s
     wind_direct::Float64 = 0.0     #grados
-    roughness_len::Float64 = 0.2    # m
-
 
 end
 
