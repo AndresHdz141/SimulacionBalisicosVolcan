@@ -11,28 +11,32 @@ end
 
 
 
-
-function aceleracion(obj::VolcanicProjectile, env::Environment, velocity::SVector)
-
-#=
-Añadir la logica de la aceleracion para el tipo de particula VolcanicProyectile en un ambiente Environment.
-=#
-
+#Vector
+function aceleracion(obj::VolcanicProjectile, env::Environment, position::SVector,  velocity::SVector)
+F_g = ForceGravity(obj, env)
+F_d = ForceDrag(obj, env, position, velocity)
+F_total = F_g + F_d
+return F_total/obj.masa
 end
 
 #Agregar funcion de densidad del aire respecto a la altura (Barometric formula)
-function DensidadAire(obj::VolcanicProjectile, env::Environment)
-return env.rho0 * exp((-env.M * norm(env.g) * obj.pos[3])/(env.R * env.T0))
+#Escalar
+function DensidadAire(env::Environment, position::SVector)
+return env.rho0 * exp((-env.M * norm(env.g) * position[3])/(env.R * env.T0))
 end
 
 #FUERZAS----------------
 
+#Vector
 function ForceGravity(obj::VolcanicProjectile, env::Environment)
-    return obj.mass .* env.g
+    return obj.masa .* env.g
 end
 
-function ForceDrag(obj::VolcanicProjectile, env::Environment)
-    rho = DensidadAire(obj, env)
-    return (1/(2*obj.masa)) * rho * obj.area * norm(obj.v) ^ 2 * obj.ca
+#Vector
+function ForceDrag(obj::VolcanicProjectile, env::Environment, position::SVector, velocity::SVector)
+    rho = DensidadAire(position, obj)
+    return  -(1/2) * rho * obj.area * norm(velocity) * obj.ca * velocity
+end
+
 
 end
