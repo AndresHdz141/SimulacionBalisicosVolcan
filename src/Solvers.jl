@@ -1,6 +1,6 @@
 module Solvers
-include("Physics.jl") #Incluye las funciones del archivo "Physics.jl"
-
+using ..Physics
+export RK4!
 #Metodo RK4 
 # obj (sistema a resolver) - velocidad, posicion, masa, etc. \ Struct
 # env (universo interactuando con el sistema / ambiente) - densidad del aire, velocidad del viento, temp, etc. \ Struct

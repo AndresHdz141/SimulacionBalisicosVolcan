@@ -1,6 +1,9 @@
 module Physics
-include("Objects.jl") #Incluye los data structs del archivo "Objects.jl"
-using VolcanicProjectile, Environment #Se utilizan los structs VolcanicProyectile y Environment
+using StaticArrays
+using LinearAlgebra
+using ..Objects
+
+export aceleracion
 
 
 function initial_data_producer(obj::VolcanicProjectile, env::Environment)
@@ -12,7 +15,7 @@ end
 
 
 #Vector
-function aceleracion(obj::VolcanicProjectile, env::Environment, position::SVector,  velocity::SVector)
+function aceleracion(obj::VolcanicProjectile, env::Environment, position::SVector{3, Float64},  velocity::SVector{3, Float64})
 F_g = ForceGravity(obj, env)
 F_d = ForceDrag(obj, env, position, velocity)
 F_total = F_g + F_d
@@ -21,7 +24,7 @@ end
 
 #Agregar funcion de densidad del aire respecto a la altura (Barometric formula)
 #Escalar
-function DensidadAire(env::Environment, position::SVector)
+function DensidadAire(env::Environment, position::SVector{3, Float64})
 return env.rho0 * exp((-env.M * norm(env.g) * position[3])/(env.R * env.T0))
 end
 
@@ -33,8 +36,8 @@ function ForceGravity(obj::VolcanicProjectile, env::Environment)
 end
 
 #Vector
-function ForceDrag(obj::VolcanicProjectile, env::Environment, position::SVector, velocity::SVector)
-    rho = DensidadAire(position, obj)
+function ForceDrag(obj::VolcanicProjectile, env::Environment, position::SVector{3, Float64}, velocity::SVector{3, Float64})
+    rho = DensidadAire(env, position)
     return  -(1/2) * rho * obj.area * norm(velocity) * obj.ca * velocity
 end
 
