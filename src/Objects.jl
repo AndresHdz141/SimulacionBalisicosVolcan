@@ -34,7 +34,7 @@ Base.@kwdef mutable struct VolcanicProjectile
     ca::Float64     
     rad::Float64        #m
     dens::Float64       #kg/m^3
-    altura_ini::Float64    #Altura inicial del proyectil
+    posicion_ini::SVector{3, Float64}    #Altura inicial del proyectil
     v0::Float64         #Magnitud de velocidad inicial del proyectil
     theta::Float64      #angulo Horizontal 0 a 360
     phi::Float64        #angulo vertical 30 a 90
@@ -43,7 +43,7 @@ Base.@kwdef mutable struct VolcanicProjectile
     area::Float64 = π * rad ^ 2                     #m^2
 
     #Para optimizar se usa SVector que crea un vector con 3 espacios.
-    pos::SVector{3, Float64} = SVector{3, Float64}(0.0,0.0,altura_ini)   #m
+    pos::SVector{3, Float64} = posicion_ini                          #m
     vel::SVector{3, Float64} = SVector{3, Float64}(
         v0 * cosd(phi) * cosd(theta),
         v0 * cosd(phi) * sind(theta), 
@@ -52,13 +52,12 @@ Base.@kwdef mutable struct VolcanicProjectile
 
 end
 
-
-
 Base.@kwdef struct Environment #Caracteristicas del ambiente 
     #Añadir caracteristicas importantes - msnm = metros sobre nivel del mar
     
     altura_base::Float64       #msnm
     altura_crater::Float64     #msnm
+    radio_crater::Float64      #m 
     latitud::Float64           #°
 
     temp_cima::Float64 = -2    #°C

@@ -1,6 +1,7 @@
 module Solvers
 using ..Physics
-export RK4!
+using StaticArrays
+export RK4!, CraterRandomPos
 #Metodo RK4 
 # obj (sistema a resolver) - velocidad, posicion, masa, etc. \ Struct
 # env (universo interactuando con el sistema / ambiente) - densidad del aire, velocidad del viento, temp, etc. \ Struct
@@ -11,7 +12,6 @@ function RK4!(obj::Any, env::Any, dt::Float64)
     #k1
     k1x = copy(obj.vel)
     k1v = aceleracion(obj, env, pos0, vel0)
-
     #k2
     k2x = obj.vel + 1/2 * k1x * dt
     k2v = aceleracion(obj, env, pos0 + dt/2 * k1x, vel0 + dt/2 * k1v)
@@ -24,7 +24,14 @@ function RK4!(obj::Any, env::Any, dt::Float64)
     #Update
     obj.vel = obj.vel + dt/6 * (k1v + 2*k2v + 2k3v + k4v)
     obj.pos = obj.pos + dt/6 * (k1x + 2*k2x + 2k3x + k4x)
+    obj.acc = aceleracion(obj,env, obj.pos, obj.vel)
 end
 
+function CraterRandomPos(env::Any)
+    x = rand(-env.radio_crater:0.1:env.radio_crater)
+    y = rand(-env.radio_crater:0.1:env.radio_crater)
+    return SVector{3, Float64}(x, y, env.altura_crater)
+
+end
 
 end

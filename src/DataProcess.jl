@@ -1,17 +1,18 @@
 module DataProcess
 #Generar graficas y procesar datos (funciones)
-using GLMakie
+using GLMakie #Libreria para graficar en 3d utilizando GPU
 using StaticArrays
-GLMakie.activate!(title = "Simulacion Balísticos", fxaa = false)
 
 export PlotGraph
 
 function PlotGraph(data)
-fig, ax, plt = scatter(data, axis = (type = Axis3, title = "3D Proyectile Trayectory"))
+fig = Figure()
+ax = Axis3(fig[1, 1], title = "Multiple 3D Data Sets",
+           xlabel = "X", ylabel = "Y", zlabel = "Z")
+for vector in data
+lines!(ax, vector.pos)
+end
 display(fig)
 end
-
-
-
 
 end
