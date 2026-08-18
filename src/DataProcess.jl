@@ -7,12 +7,16 @@ export PlotGraph
 
 function PlotGraph(data)
 fig = Figure()
-ax = Axis3(fig[1, 1], title = "Multiple 3D Data Sets",
-           xlabel = "X", ylabel = "Y", zlabel = "Z")
+ax = Axis3(fig[1, 1], title = "Trayectorias de Proyectiles 3D",
+           xlabel = "X (m)", ylabel = "Y (m)", zlabel = "Z (m)")
 for vector in data
 lines!(ax, vector.pos)
 end
 display(fig)
 end
+
+
+
+
 
 end

@@ -1,6 +1,6 @@
 module Objects
 using StaticArrays
-export Eruption, debil, media, fuerte,  VolcanicProjectile, Environment
+export Eruption, debil, media, fuerte,  VolcanicProjectile,ProyectileData, Environment
 
 #tipo de erupcion
 struct Eruption
@@ -50,6 +50,14 @@ Base.@kwdef mutable struct VolcanicProjectile
         v0 * sind(phi))                                           #m/s
     acc::SVector{3, Float64} = SVector{3, Float64}(0.0,0.0,0.0)   #m/s^2
 
+end
+
+struct ProyectileData
+    id::Int64
+    masa::Float64
+    pos::Vector{SVector{3, Float64}}
+    vel::Vector{SVector{3, Float64}}
+    acc::Vector{SVector{3, Float64}}
 end
 
 Base.@kwdef struct Environment #Caracteristicas del ambiente 

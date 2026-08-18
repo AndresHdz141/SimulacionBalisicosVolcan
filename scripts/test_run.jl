@@ -10,15 +10,10 @@ using .Solvers
 using .DataProcess
 using StaticArrays
 
-    struct ProyectileData
-        id::Int64
-        pos::Vector{SVector{3, Float64}}
-        vel::Vector{SVector{3, Float64}}
-        acc::Vector{SVector{3, Float64}}
-    end
 
 #Funcion para la prueba
 function run_test() 
+    start_time = time()
     #Se genera el proyectil
     volcan = Environment(
         altura_base = 2000.0,
@@ -26,7 +21,8 @@ function run_test()
         radio_crater = 140.0,
         latitud = 180.0,
     )
-    n_proyectiles = 500
+    n_proyectiles = 1000
+    max_steps = 10000
     all_projectiles_data = Vector{ProyectileData}(undef, n_proyectiles)
 
     for i ∈ 1:n_proyectiles
@@ -40,39 +36,42 @@ function run_test()
             theta = rand(0.0:360.0)  ,         #angulo Horizontal 0 a 360
             phi = rand(30.0:90)             #angulo vertical 30 a 90
         )
-           #= #Se imprimen algunas caracteristicas
-            println("Running...")
-            println("Masa:", roca.masa)
-            println("Posicion:", roca.pos)
-            println("Velocidad", roca.vel)
-            =#
         #Se generan vectores para guardar los datos de posicion, velocidad, aceleracion y tiempo
-        pos_history::Vector{SVector{3, Float64}} = [roca.pos]
-        vel_history::Vector{SVector{3, Float64}} = [roca.vel]
-        acc_history::Vector{SVector{3, Float64}} = [roca.acc]
-        time_history::Vector{Float64} = [0.0]
-
+        pos_history = Vector{SVector{3, Float64}}(undef, max_steps)
+        vel_history = Vector{SVector{3, Float64}}(undef, max_steps)
+        acc_history = Vector{SVector{3, Float64}}(undef, max_steps)
+        time_history = Vector{Float64}(undef, max_steps)
         dt = 0.1
         time = 0.0
+        #Condiciones iniciales de vectores:
+        pos_history[1] = roca.pos
+        vel_history[1] = roca.vel
+        acc_history[1] = roca.acc
+        time_history[1] = time
         #Se itera y guardan los datos hasta que la roca toce el suelo (z=0)
-        while (roca.pos[3] >= volcan.altura_base)
+        step = 1
+        while ((roca.pos[3] >= volcan.altura_base) && (step < max_steps))
             time += dt
-            push!(time_history, time)
             RK4!(roca, volcan, dt)
-            push!(pos_history, roca.pos)
-            push!(vel_history, roca.vel)
-            push!(acc_history, roca.acc)
+            step+=1
+            pos_history[step] = roca.pos
+            vel_history[step] = roca.vel
+            acc_history[step] = roca.acc
+            time_history[step] = time
         end
+        #Ajustar el tamaño de los vectores (Recorta los elementos despues de *STEP*)
+        resize!(pos_history, step)
+        resize!(vel_history, step)
+        resize!(acc_history, step)
+        resize!(time_history, step)
         #join position, velocity and acceleration into a vector
-        all_projectiles_data[i] = ProyectileData(i, pos_history, vel_history, acc_history)
-        println("Proyectil ", i)
+        all_projectiles_data[i] = ProyectileData(i,roca.masa, pos_history, vel_history, acc_history)
+
     end
-    print("Finalizado")
-
+    elapsed_time = time() - start_time
+    println("Simulation completed in: ", elapsed_time, " seconds")
     PlotGraph(all_projectiles_data)
-
     readline()
-    
 end
-
 run_test()
+
