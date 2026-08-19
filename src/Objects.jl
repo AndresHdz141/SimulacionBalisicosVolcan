@@ -67,6 +67,7 @@ Base.@kwdef struct Environment #Caracteristicas del ambiente
     altura_crater::Float64     #msnm
     radio_crater::Float64      #m 
     latitud::Float64           #°
+    velocidad_aire::SVector{3, Float64}
 
     temp_cima::Float64 = -2    #°C
     temp_int::Float64 = 950    #°C
@@ -87,6 +88,11 @@ Base.@kwdef struct Environment #Caracteristicas del ambiente
 
 end
 
+struct VolcanoData
+
+        
+
+end
 
 
 
