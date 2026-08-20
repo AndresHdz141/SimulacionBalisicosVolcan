@@ -15,4 +15,25 @@ end
 display(fig)
 end
 
+function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float64, xmax::Float64, ymin::Float64, nx::Int, ny::Int)
+
+    N = length(xp)
+
+    b = (xmax - xmin)/nx
+    h = (ymax - ymin)/ny
+
+    n_ij = zeros(Int, nx, ny)
+
+    for k in 1:N
+        i = round(Int, (xp[k] - xmin)/b)
+        j = round(Int, (yp[k] - ymin)/h)
+        i = clamp(i, 1, nx)
+        j = clamp(j, 1, ny)
+        n_ij[i, j] += 1
+    end
+
+    P_ij = n_ij ./ N
+
+    return n_ij, P_ij
+end
 end

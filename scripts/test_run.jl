@@ -71,6 +71,11 @@ function run_test()
 
     PlotGraph(all_projectiles_data)
 
+    xp = [p.pos[end][1] for p in all_projectiles_data]
+    yp = [p.pos[end][2] for p in all_projectiles_data]
+
+    n_ij, P_ij = ImpactProbability(xp, yp, xmin=-3000, xmax=3000, ymin=-3000, ymax=3000, nx=40, ny=40)
+
     readline()
     
 end
