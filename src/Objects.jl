@@ -1,7 +1,8 @@
 module Objects
 using StaticArrays
-export Eruption, debil, media, fuerte,  VolcanicProjectile,ProyectileData, Environment
+using TiffImages
 
+export Eruption, debil, media, fuerte,  VolcanicProjectile,ProyectileData, Environment, VolcanoData
 #tipo de erupcion
 struct Eruption
 
@@ -88,10 +89,12 @@ Base.@kwdef struct Environment #Caracteristicas del ambiente
 
 end
 
-struct VolcanoData
-
-        
-
+Base.@kwdef struct VolcanoData
+    path
+    pixel_size::Int64 = 30
+    z_matrix::Matrix{Float32} = Float32.(TiffImages.load(path))
+    x_coords = (-(size(z_matrix, 2) / 2) * pixel_size):pixel_size:((size(z_matrix, 2) / 2) * pixel_size - 1)
+    y_coords = (-(size(z_matrix, 1) / 2) * pixel_size):pixel_size:((size(z_matrix, 1) / 2) * pixel_size - 1)
 end
 
 

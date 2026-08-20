@@ -1,6 +1,6 @@
 
 include("../src/Objects.jl")
-include("../src/Physics.jl")  # Asumiendo que existe
+include("../src/Physics.jl")  
 include("../src/Solvers.jl")
 include("../src/DataProcess.jl")
 
@@ -14,12 +14,14 @@ using StaticArrays
 #Funcion para la prueba
 function run_test() 
     #Se genera la informacion del volcan
+        filepath = joinpath(@__DIR__, "..", "data", "input", "volcano4_hh.tif")
+        volcan = VolcanoData(path = filepath)
 
     #Se genera la informacion del 
     entorno = Environment(
         altura_base = 2400.0,
-        altura_crater = 5000.0,
-        radio_crater = 350.0,
+        altura_crater = 5160.0,
+        radio_crater = 300.0,
         latitud = 180.0,
         velocidad_aire = SVector{3, Float64}(1.0,0.0,0.0)   #m/s
     )
@@ -32,7 +34,7 @@ function run_test()
 
     for i ∈ 1:n_proyectiles
         #Se genera un proyectil con Caracteristicas, posicion y velocidad.
-        volcan = 
+
 
         roca = VolcanicProjectile(
             ca = 0.56,
@@ -76,7 +78,7 @@ function run_test()
         all_projectiles_data[i] = ProyectileData(i,roca.masa, pos_history, vel_history, acc_history)
 
     end
-    PlotGraph(all_projectiles_data)
+    PlotGraph(all_projectiles_data, volcan)
     readline()
 end
 run_test()

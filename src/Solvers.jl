@@ -34,4 +34,13 @@ function CraterRandomPos(env::Any)
 
 end
 
+function CheckColisions(particle::Any, VolcanoGrid::Any)
+
+    x,y,z = particle.pos
+    rows, cols = VolcanoGrid.z_matrix
+    half_x = 
+
+end
+
+
 end
