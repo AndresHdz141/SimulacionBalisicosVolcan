@@ -19,22 +19,19 @@ function run_test()
 
     #Se genera la informacion del 
     entorno = Environment(
-        altura_base = 2400.0,
         altura_crater = 5160.0,
         radio_crater = 300.0,
-        latitud = 180.0,
-        velocidad_aire = SVector{3, Float64}(1.0,0.0,0.0)   #m/s
+        velocidad_aire = SVector{3, Float64}(5.0,0.0,0.0)   #m/s
     )
 
     #Se especifican el numero de proyectiles y pasos maximos por dar
-    n_proyectiles = 20
+    n_proyectiles = 1000
     max_steps = 10000
     #Se genera el vector para guardar la informacion de los proyectiles
     all_projectiles_data = Vector{ProyectileData}(undef, n_proyectiles)
 
     for i ∈ 1:n_proyectiles
         #Se genera un proyectil con Caracteristicas, posicion y velocidad.
-
 
         roca = VolcanicProjectile(
             ca = 0.56,
@@ -58,13 +55,23 @@ function run_test()
         vel_history[1] = roca.vel
         acc_history[1] = roca.acc
         time_history[1] = time
-        #Se itera y guardan los datos hasta que la roca toce el suelo (z=0)
+        #Se itera y guardan los datos hasta que la roca toce el suelo (topologia con interpolacion entre puntos)
         step = 1
-        while ((roca.pos[3] >= entorno.altura_base) && (step < max_steps))
+        while (step < max_steps)
+            pos_ant = roca.pos 
+
             time += dt
             RK4!(roca, entorno, dt)
+
+            if !CheckColisions(roca, volcan)
+                exact_pos = BinarySearch(pos_ant, roca.pos, volcan) #Encontrar el punto medio
+                step += 1
+                pos_history[step] = exact_pos
+                break # Salir del loop
+            end
             step+=1
-            pos_history[step] = roca.pos
+
+            pos_history[step] = roca.pos    
             vel_history[step] = roca.vel
             acc_history[step] = roca.acc
             time_history[step] = time
@@ -76,7 +83,6 @@ function run_test()
         resize!(time_history, step)
         #join position, velocity and acceleration into a vector
         all_projectiles_data[i] = ProyectileData(i,roca.masa, pos_history, vel_history, acc_history)
-
     end
     PlotGraph(all_projectiles_data, volcan)
     readline()
