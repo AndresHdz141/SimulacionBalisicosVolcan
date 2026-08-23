@@ -3,7 +3,7 @@ module DataProcess
 using GLMakie #Libreria para graficar en 3d utilizando GPU
 using StaticArrays
 
-export PlotGraph
+export PlotGraph, ImpactProbability
 
 function PlotGraph(data)
 fig = Figure()
@@ -15,18 +15,18 @@ end
 display(fig)
 end
 
-function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float64, xmax::Float64, ymin::Float64, nx::Int, ny::Int)
+function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float64, xmax::Float64, ymin::Float64, ymax::Float64, nx::Int, ny::Int)
 
     N = length(xp)
 
-    b = (xmax - xmin)/nx
-    h = (ymax - ymin)/ny
+    dx = (xmax - xmin)/nx
+    dy = (ymax - ymin)/ny
 
     n_ij = zeros(Int, nx, ny)
 
     for k in 1:N
-        i = round(Int, (xp[k] - xmin)/b)
-        j = round(Int, (yp[k] - ymin)/h)
+        i = round(Int, (xp[k] - xmin)/dx)
+        j = round(Int, (yp[k] - ymin)/dy)
         i = clamp(i, 1, nx)
         j = clamp(j, 1, ny)
         n_ij[i, j] += 1
@@ -34,6 +34,20 @@ function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float
 
     P_ij = n_ij ./ N
 
-    return n_ij, P_ij
+    x_contorno = xmin:dx:xmax
+    y_contorno = ymin:dy:ymax
+
+    return n_ij, P_ij, x_contorno, y_contorno
 end
+
+function PlotImpact(P_ij::Matrix{Float64}, x_contorno, y_contorno)
+    fig = Figure()
+    ax = Axis(fig[1, 1], title = "Probabilidad de impacto por celda",
+              xlabel = "X (m)", ylabel = "Y (m)", aspect = DataAspect())
+    hm = heatmap!(ax, x_contorno, y_contorno, P_ij, colormap = :viridis)
+    Colorbar(fig[1, 2], hm, label = "P_ij = n_ij / N")
+    display(fig)
+    return fig
+end
+
 end
