@@ -23,13 +23,22 @@ function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float
     dy = (ymax - ymin)/ny
 
     n_ij = zeros(Int, nx, ny)
+    fuera_contorno = 0
 
     for k in 1:N
+        if xs[k] < xmin || xs[k] >= xmax || ys[k] < ymin || ys[k] >= ymax
+            fuera_contorno += 1
+            continue
+        end 
         i = round(Int, (xp[k] - xmin)/dx)
         j = round(Int, (yp[k] - ymin)/dy)
         i = clamp(i, 1, nx)
         j = clamp(j, 1, ny)
         n_ij[i, j] += 1
+    end
+
+    if fuera_contorno > 0
+        println("Aviso: ", fuera_contorno, " proyectiles cayeron fuera del contorno de la malla y no se contabilizaron.")
     end
 
     P_ij = n_ij ./ N
