@@ -1,7 +1,7 @@
 module Solvers
 using ..Physics
 using StaticArrays
-export RK4!, CraterRandomPos
+export RK4!, CraterRandomPos, CheckColisions, BinarySearch
 #Metodo RK4 
 # obj (sistema a resolver) - velocidad, posicion, masa, etc. \ Struct
 # env (universo interactuando con el sistema / ambiente) - densidad del aire, velocidad del viento, temp, etc. \ Struct
@@ -34,4 +34,39 @@ function CraterRandomPos(env::Any)
 
 end
 
+end
+
+function CheckColisions(particle::Any, VolcanoGrid::Any)
+    grid_z = VolcanoGrid.z_matrix
+    x, y, z = particle.pos
+    inv_pixel_size = 1 / VolcanoGrid.pixel_size
+    x_ref = VolcanoGrid.x_coords[1]
+    y_ref = VolcanoGrid.y_coords[1]
+    x_shift = (x - x_ref) * inv_pixel_size
+    y_shift = (y - y_ref) * inv_pixel_size
+    i = floor(Int, x_shift)
+    j = floor(Int, y_shift)
+    dx = x_shift - i
+    dy = y_shift - j
+    z00 = grid_z[j,   i]
+    z10 = grid_z[j,   i+1]
+    z01 = grid_z[j+1, i]
+    z11 = grid_z[j+1, i+1]
+    interpolated_z = (1.0 - dx) * (1.0 - dy) * z00 +
+                    dx         * (1.0 - dy) * z10 +
+                    (1.0 - dx) * dy         * z01 +
+                    dx         * dy         * z11
+    return (z > interpolated_z)
+end
+
+function BinarySearch(p_prev, p_next, volcan, it = 100)
+    for _ in 1:it
+        p_mid = p_prev + 0.5 * (p_next - p_prev)
+        if CheckColisions((pos = p_mid,), volcan)
+            p_next = p_mid
+        else
+            p_prev = p_mid
+        end
+    end
+    return p_prev
 end

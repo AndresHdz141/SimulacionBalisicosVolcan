@@ -36,10 +36,11 @@ function ForceGravity(obj::VolcanicProjectile, env::Environment)
 end
 
 #Vector
-function ForceDrag(obj::VolcanicProjectile, env::Environment, position::SVector{3, Float64}, velocity::SVector{3, Float64})
+function ForceDrag(obj::VolcanicProjectile, env::Environment, position::SVector{3, Float64}, velocidad_proyectil::SVector{3, Float64})
     rho = DensidadAire(env, position)
-    return  -(1/2) * rho * obj.area * norm(velocity) * obj.ca * velocity
+    velocidad_rel = velocidad_proyectil - env.velocidad_aire
+    return  -(1/2) * rho * obj.area * norm(velocidad_rel) * obj.ca * velocidad_rel
 end
 
-
+``
 end
