@@ -3,7 +3,7 @@ module DataProcess
 using GLMakie #Libreria para graficar en 3d utilizando GPU
 using StaticArrays
 
-export PlotGraph, ImpactProbability
+export PlotGraph, ImpactProbability, PlotImpact
 
 function PlotGraph(data)
 fig = Figure()
@@ -26,7 +26,7 @@ function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float
     fuera_contorno = 0
 
     for k in 1:N
-        if xs[k] < xmin || xs[k] >= xmax || ys[k] < ymin || ys[k] >= ymax
+        if xp[k] < xmin || xp[k] >= xmax || yp[k] < ymin || yp[k] >= ymax
             fuera_contorno += 1
             continue
         end 

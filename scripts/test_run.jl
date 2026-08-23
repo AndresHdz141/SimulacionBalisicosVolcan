@@ -74,9 +74,9 @@ function run_test()
     xp = [p.pos[end][1] for p in all_projectiles_data]
     yp = [p.pos[end][2] for p in all_projectiles_data]
 
-    n_ij, P_ij, x_contorno, y_contorno = ImpactProbability(xp, yp, -3000.0, 3000.0, -3000.0, 3000.0, 40, 40)
+    n_ij, P_ij, x_contorno, y_contorno = ImpactProbability(xp, yp, -5000.0, 5000.0, -5000.0, 5000.0, 40, 40)
 
-    PlotImpactGrid(P_ij, x_contorno, y_contorno)
+    PlotImpact(P_ij, x_contorno, y_contorno)
 
     readline()
     
