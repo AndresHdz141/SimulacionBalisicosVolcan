@@ -53,12 +53,13 @@ Base.@kwdef mutable struct VolcanicProjectile
 
 end
 
-struct ProyectileData
+mutable struct ProyectileData
     id::Int64
     masa::Float64
     pos::Vector{SVector{3, Float64}}
     vel::Vector{SVector{3, Float64}}
     acc::Vector{SVector{3, Float64}}
+    EK::Float64
 end
 
 Base.@kwdef struct Environment #Caracteristicas del ambiente 

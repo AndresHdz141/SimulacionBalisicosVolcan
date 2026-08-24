@@ -3,11 +3,13 @@ include("../src/Objects.jl")
 include("../src/Physics.jl")  
 include("../src/Solvers.jl")
 include("../src/DataProcess.jl")
+include("../src/Energy.jl")
 
 using .Objects
 using .Physics 
 using .Solvers
 using .DataProcess
+using .Energy
 using StaticArrays
 
 
@@ -67,6 +69,9 @@ function run_test()
                 exact_pos = BinarySearch(pos_ant, roca.pos, volcan) #Encontrar el punto medio
                 step += 1
                 pos_history[step] = exact_pos
+                vel_history[step] = roca.vel
+                acc_history[step] = roca.acc
+                time_history[step] = time
                 break # Salir del loop
             end
             step+=1
@@ -82,10 +87,12 @@ function run_test()
         resize!(acc_history, step)
         resize!(time_history, step)
         #join position, velocity and acceleration into a vector
-        all_projectiles_data[i] = ProyectileData(i,roca.masa, pos_history, vel_history, acc_history)
+        all_projectiles_data[i] = ProyectileData(i, roca.masa, pos_history, vel_history, acc_history, NaN)
     end
-    PlotGraph(all_projectiles_data, volcan)
+    energyAnalysis!(all_projectiles_data)
+    PlotEnergyFigures(all_projectiles_data, volcan)
     readline()
+    return all_projectiles_data
 end
-run_test()
+all_projectiles_data = run_test()
 
