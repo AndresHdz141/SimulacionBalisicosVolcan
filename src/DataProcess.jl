@@ -50,7 +50,7 @@ function GridImpactProbability3D(all_projectiles_data::Vector{ProyectileData}, v
 end
 
 function CellSurfaceAreas(volcan)
-    z  = volcan.z_matrix          # (ny, nx): filas = y, columnas = x
+    z  = volcan.z_matrix
     ny, nx = size(z)
     p  = Float64(volcan.pixel_size)
     A  = fill(p^2, nx, ny)
@@ -60,7 +60,7 @@ function CellSurfaceAreas(volcan)
         dhdy = (z[j+1, i] - z[j-1, i]) / (2p)
         A[i, j] = p^2 * sqrt(1 + dhdx^2 + dhdy^2)
     end
-    return A   # bordes quedan con área plana p^2 (sin vecino en ambos lados)
+    return A
 end
 
 function AggregateGrid(n_ij::Matrix{Int}, A_ij::Matrix{Float64}, block_size::Int)

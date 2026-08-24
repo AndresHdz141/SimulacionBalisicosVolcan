@@ -87,9 +87,26 @@ function run_test()
     PlotGraph(all_projectiles_data, volcan)
 
     n_ij, P_ij = GridImpactProbability3D(all_projectiles_data, volcan)
+    A_ij = CellSurfaceAreas(volcan)
     
+    println("Celdas con al menos 1 impacto (resolución de píxel): ",
+            count(>(0), n_ij), " de ", length(n_ij))
+
+    # --- NUEVO: agregación en bloques ---
+    block_size = 10   # ajustar según el diagnóstico de arriba
+    n_IJ, A_IJ = AggregateGrid(n_ij, A_ij, block_size)
+    P_IJ = n_IJ ./ n_proyectiles
+    D_IJ = n_IJ ./ (n_proyectiles .* A_IJ)
+
+    println("Celdas con al menos 1 impacto (bloques de $block_size): ",
+            count(>(0), n_IJ), " de ", length(n_IJ))
     println("Suma de P_ij: ", sum(P_ij))
-    PlotImpactMap3D(volcan,P_ij; label= "P_ij = n_ij / N")
+
+    x_coords_agg = AggregateCoords(volcan.x_coords, block_size)
+    y_coords_agg = AggregateCoords(volcan.y_coords, block_size)
+    z_matrix_agg = volcan.z_matrix[1:block_size:end, 1:block_size:end]
+    PlotImpactMap3D(x_coords_agg, y_coords_agg, z_matrix_agg, P_IJ;
+                     label = "P_ij = n_ij / N")
 
     readline()
     
