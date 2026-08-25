@@ -3,11 +3,13 @@ include("../src/Objects.jl")
 include("../src/Physics.jl")
 include("../src/Solvers.jl")
 include("../src/DataProcess.jl")
+include("../src/Probability.jl")
 
 using .Objects
 using .Physics
 using .Solvers
 using .DataProcess
+using .Probability
 using StaticArrays
 
     struct ProyectileData
@@ -73,7 +75,7 @@ function run_test()
 
     xp = [p.pos[end][1] for p in all_projectiles_data]
     yp = [p.pos[end][2] for p in all_projectiles_data]
-
+    
     n_ij, P_ij, x_contorno, y_contorno = ImpactProbability(xp, yp, -5000.0, 5000.0, -5000.0, 5000.0, 40, 40)
 
     PlotImpact(P_ij, x_contorno, y_contorno, volcan)
