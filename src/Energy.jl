@@ -31,19 +31,20 @@ function PlotEnergyFigures(
 
     isempty(proyectiles) && error("No hay energías de impacto válidas para graficar.")
 
-    # Datos que se mostrarán: posición final y energía convertida de J a MJ.
+    #para mostrar el impacto
     x_impacto = [proyectil.pos[end][1] for proyectil in proyectiles]
     y_impacto = [proyectil.pos[end][2] for proyectil in proyectiles]
-    energia_mj = [proyectil.EK / 1.0e6 for proyectil in proyectiles]
 
-    # Estadísticos principales que se mostrarán en el póster.
+    energia_mj = [proyectil.EK / 1.0e6 for proyectil in proyectiles] #cambiar J a MJ
+
+    # Estadísticos principales 
     energia_mediana = median(energia_mj)
     energia_p90 = quantile(energia_mj, 0.90)
     energia_p95 = quantile(energia_mj, 0.95)
     energia_maxima = maximum(energia_mj)
     energia_media = mean(energia_mj)
 
-    # Cada impacto se clasifica con percentiles para evitar una leyenda logarítmica.
+    # Esto se hace para clasificar el tipo de proyectil dependiendo de donde esta en una divicion de percentiles
     categorias = map(energia_mj) do energia
         if energia <= energia_mediana
             1
@@ -67,10 +68,10 @@ function PlotEnergyFigures(
 
     mkpath(output_dir)
 
-    # IMAGEN 1: mapa 2D de impactos clasificados por nivel de energía.
+    # mapa 2D de impactos clasificados por nivel de energía.
     fig_mapa = Figure(size = (1600, 1050), fontsize = 22, backgroundcolor = :white)
     Label(
-        fig_mapa[0, 1:2],
+        fig_mapa[0, 1],
         "Distribución espacial de la energía de impacto",
         fontsize = 32,
         font = :bold,
@@ -82,10 +83,12 @@ function PlotEnergyFigures(
         fig_mapa[1, 1],
         xlabel = "X (m)",
         ylabel = "Y (m)",
+        xticks  = LinearTicks(5),
+        yticks  = LinearTicks(5),
         aspect = DataAspect(),
     )
 
-    # Las curvas de nivel grises representan la elevación del terreno.
+    # agarrar las curvas de nivel que uso andresito para hacer un mapa en 2D
     contourf!(
         ax_mapa,
         volcan.x_coords,
@@ -94,7 +97,7 @@ function PlotEnergyFigures(
         levels = 24,
         colormap = :Greys,
     )
-
+    #coloca los proyectiles encima del mapa
     for categoria in 1:4
         indices = findall(==(categoria), categorias)
         scatter!(
@@ -115,17 +118,19 @@ function PlotEnergyFigures(
         "Nivel relativo de energía",
         framevisible = false,
     )
+
+    colgap!(fig_mapa.layout,1,10)
     Label(
-        fig_mapa[2, 1:2],
+        fig_mapa[2, 1],
         "Clasificación relativa: baja ≤ P50, media P50–P90, alta P90–P95 y muy alta > P95.",
         fontsize = 18,
         halign = :center,
     )
 
-    # IMAGEN 2: histograma y resumen estadístico en unidades reales de MJ.
+    # histograma y resumen estadístico 
     fig_distribucion = Figure(size = (1500, 900), fontsize = 22, backgroundcolor = :white)
     Label(
-        fig_distribucion[0, 1:2],
+        fig_distribucion[0, 1],
         "Distribución de energías de impacto",
         fontsize = 32,
         font = :bold,
@@ -136,21 +141,22 @@ function PlotEnergyFigures(
     ax_histograma = Axis(
         fig_distribucion[1, 1],
         xlabel = "EK de impacto (MJ)",
-        ylabel = "Número de proyectiles",
+        ylabel = "Proporción de proyectiles",
     )
 
     # Se usa un número de intervalos proporcional a la raíz del total de datos.
-    numero_bins = clamp(round(Int, sqrt(length(energia_mj))), 12, 35)
+    numero_bins = clamp(round(Int, sqrt(length(energia_mj))), 12, 60)
     hist!(
         ax_histograma,
         energia_mj,
         bins = numero_bins,
+        normalization = :probability,
         color = (:darkorange, 0.85),
         strokecolor = :white,
         strokewidth = 1,
     )
 
-    # Líneas de referencia para el centro de los datos y su zona de alta energía.
+    # Líneas de referencia para el centro de los datos y percentil 95 para definir donde estan las energias altas
     vlines!(
         ax_histograma,
         [energia_mediana],
@@ -167,7 +173,7 @@ function PlotEnergyFigures(
     )
     axislegend(ax_histograma, position = :rt, framevisible = false)
 
-    # Resumen numérico con una explicación directa del P95.
+    # Resumen numérico con una explicación de P95.
     resumen = join(
         [
             "RESUMEN",

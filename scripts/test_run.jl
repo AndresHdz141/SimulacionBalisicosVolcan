@@ -40,7 +40,7 @@ function run_test()
             rad = rand(0.032:0.005:5.0) ,  #m
             dens = rand(2100:2500),  #kg/m^3
             posicion_ini = CraterRandomPos(entorno),     #Altura inicial del proyectil
-            v0 = rand(debil.Vmin:debil.Vmax),          #Magnitud de velocidad inicial del proyectil
+            v0 = rand(media.Vmin:media.Vmax),          #Magnitud de velocidad inicial del proyectil
             theta =rand(0.0:360.0),         #angulo Horizontal 0 a 360
             phi = rand(0.0:180)             #angulo vertical 30 a 90
         )
