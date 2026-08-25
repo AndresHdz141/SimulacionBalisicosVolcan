@@ -1,11 +1,11 @@
 
 include("../src/Objects.jl")
-include("../src/Physics.jl")  # Asumiendo que existe
+include("../src/Physics.jl")
 include("../src/Solvers.jl")
 include("../src/DataProcess.jl")
 
 using .Objects
-using .Physics 
+using .Physics
 using .Solvers
 using .DataProcess
 using StaticArrays
@@ -76,7 +76,7 @@ function run_test()
 
     n_ij, P_ij, x_contorno, y_contorno = ImpactProbability(xp, yp, -5000.0, 5000.0, -5000.0, 5000.0, 40, 40)
 
-    PlotImpact(P_ij, x_contorno, y_contorno)
+    PlotImpact(P_ij, x_contorno, y_contorno, volcan)
 
     readline()
     
