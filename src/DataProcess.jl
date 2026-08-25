@@ -49,12 +49,52 @@ function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float
     return n_ij, P_ij, x_contorno, y_contorno
 end
 
-function PlotImpact(P_ij::Matrix{Float64}, x_contorno, y_contorno)
-    fig = Figure()
-    ax = Axis(fig[1, 1], title = "Probabilidad de impacto por celda",
-              xlabel = "X (m)", ylabel = "Y (m)", aspect = DataAspect())
-    hm = heatmap!(ax, x_contorno, y_contorno, P_ij, colormap = :viridis)
+function PlotImpact(P_ij::Matrix{Float64}, x_contorno, y_contorno, volcan)
+    fig = Figure(size = (1600, 1050), fontsize = 22, backgroundcolor = :white)
+    Label(
+        fig[0, 1],
+        "Probabilidad de impacto por celda",
+        fontsize = 32,
+        font = :bold,
+        halign = :center,
+        justification = :center,
+    )
+    ax = Axis(
+        fig[1, 1],
+        xlabel = "X (m)",
+        ylabel = "Y (m)",
+        xticks = LinearTicks(5),
+        yticks = LinearTicks(5),
+        aspect = DataAspect(),
+    )
+    # agarrar las curvas de nivel que uso andresito para hacer un mapa en 2D
+    contourf!(
+        ax,
+        volcan.x_coords,
+        volcan.y_coords,
+        volcan.z_matrix',
+        levels = 24,
+        colormap = :Greys,
+    )
+    
+    
+    P_plot = map(v -> v == 0.0 ? NaN : v, P_ij)
+
+    hm = heatmap!(
+        ax,
+        x_contorno,
+        y_contorno,
+        P_plot,
+        colormap = :viridis,
+        colorrange = (0.0, maximum(P_ij)),
+    )
+
     Colorbar(fig[1, 2], hm, label = "P_ij = n_ij / N")
+    colgap!(fig.layout, 1, 10)
+
+    xlims!(ax, first(x_contorno), last(x_contorno))
+    ylims!(ax, first(y_contorno), last(y_contorno))
+
     display(fig)
     return fig
 end
