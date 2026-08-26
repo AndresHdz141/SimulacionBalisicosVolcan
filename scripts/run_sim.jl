@@ -4,4 +4,3 @@ Pkg.activate(dirname(@__DIR__)) #Se activa el proyect environment para utilizar 
 
 print("Running simulation...")
 
-

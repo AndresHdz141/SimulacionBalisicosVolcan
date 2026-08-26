@@ -1,1 +1,1 @@
-x
+# Archivo temporal sin uso.
