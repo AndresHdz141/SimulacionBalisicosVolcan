@@ -21,7 +21,7 @@ function run_test()
         filepath = joinpath(@__DIR__, "..", "data", "input", "volcano4_hh.tif")
         volcan = VolcanoData(path = filepath)
 
-    #Se genera la informacion del entorno
+    #Se genera la informacion del 
     entorno = Environment(
         altura_crater = 5160.0,
         radio_crater = 300.0,
@@ -32,7 +32,7 @@ function run_test()
     n_proyectiles = 1000
     max_steps = 10000
     #Se genera el vector para guardar la informacion de los proyectiles
-    all_projectiles_data = ProyectileData[]
+    all_projectiles_data = Vector{ProyectileData}(undef, n_proyectiles)
 
     for i ∈ 1:n_proyectiles
         #Se genera un proyectil con Caracteristicas, posicion y velocidad.
@@ -61,28 +61,24 @@ function run_test()
         time_history[1] = time
         #Se itera y guardan los datos hasta que la roca toce el suelo (topologia con interpolacion entre puntos)
         step = 1
-        impacto_encontrado = false
         while (step < max_steps)
-            pos_ant = roca.pos
+            pos_ant = roca.pos 
 
             time += dt
             RK4!(roca, entorno, dt)
 
-            if !IsInsideVolcanoGrid(roca, volcan)
-                break
-            elseif !CheckColisions(roca, volcan)
+            if !CheckColisions(roca, volcan)
                 exact_pos = BinarySearch(pos_ant, roca.pos, volcan) #Encontrar el punto medio
                 step += 1
                 pos_history[step] = exact_pos
                 vel_history[step] = roca.vel
                 acc_history[step] = roca.acc
                 time_history[step] = time
-                impacto_encontrado = true
                 break # Salir del loop
             end
             step+=1
 
-            pos_history[step] = roca.pos
+            pos_history[step] = roca.pos    
             vel_history[step] = roca.vel
             acc_history[step] = roca.acc
             time_history[step] = time
@@ -93,15 +89,8 @@ function run_test()
         resize!(acc_history, step)
         resize!(time_history, step)
         #join position, velocity and acceleration into a vector
-        if impacto_encontrado
-            push!(
-                all_projectiles_data,
-                ProyectileData(i, roca.masa, pos_history, vel_history, acc_history, NaN),
-            )
-        end
+        all_projectiles_data[i] = ProyectileData(i, roca.masa, pos_history, vel_history, acc_history, NaN)
     end
-    isempty(all_projectiles_data) && error("Ningún proyectil impactó dentro del mapa.")
-
     println("Simulación finalizada")
 
     PlotGraph(all_projectiles_data, volcan)
@@ -118,3 +107,4 @@ function run_test()
     return all_projectiles_data
 end
 all_projectiles_data = run_test()
+

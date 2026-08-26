@@ -38,7 +38,13 @@ function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float
     return n_ij, P_ij, x_contorno, y_contorno
 end
 
-function PlotImpact(P_ij::Matrix{Float64}, x_contorno, y_contorno, volcan)
+function PlotImpact(
+    P_ij::Matrix{Float64},
+    x_contorno,
+    y_contorno,
+    volcan;
+    output_dir = joinpath(@__DIR__, "..", "data", "output"),
+)
     fig = Figure(size = (1600, 1050), fontsize = 22, backgroundcolor = :white)
     Label(
         fig[0, 1],
@@ -84,6 +90,10 @@ function PlotImpact(P_ij::Matrix{Float64}, x_contorno, y_contorno, volcan)
     xlims!(ax, first(x_contorno), last(x_contorno))
     ylims!(ax, first(y_contorno), last(y_contorno))
 
+    mkpath(output_dir)
+    prob_map = joinpath(output_dir, "Probability_map.png")
+    save(prob_map, fig, px_per_unit = 2)
+    println("Mapa de probabilidad guardado en: ", abspath(prob_map))
     display(fig)
     return fig
 end
