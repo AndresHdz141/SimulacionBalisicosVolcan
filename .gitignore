@@ -19,6 +19,7 @@ JuliaLocalPreferences.toml
 # ==========================================
 data/output/*
 !data/output/.gitkeep
+!data/output/*.png
 !data/input/.gitkeep
 !scripts/.gitkeep
 

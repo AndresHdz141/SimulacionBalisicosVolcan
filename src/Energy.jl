@@ -6,7 +6,7 @@ using Statistics
 
 export PlotEnergyFigures, energyAnalysis!
 
-function energyAnalysis!(data::AbstractVector{<:ProyectileData})
+function energyAnalysis!(data)
     # Calcula y guarda la energía cinética en el impacto de cada proyectil.
     for proyectil in data
         masa = proyectil.masa
@@ -19,8 +19,8 @@ function energyAnalysis!(data::AbstractVector{<:ProyectileData})
 end
 
 function PlotEnergyFigures(
-    data::AbstractVector{<:ProyectileData},
-    volcan::VolcanoData;
+    data,
+    volcan::VolcanoData,
     output_dir = joinpath(@__DIR__, "..", "data", "output"),
 )
     # Se descartan resultados sin energía o sin una posición de impacto válida.

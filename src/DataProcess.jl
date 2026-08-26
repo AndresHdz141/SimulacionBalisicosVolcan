@@ -4,7 +4,7 @@ using GLMakie
 
 export PlotGraph
 
-function PlotGraph(data::AbstractVector{<:ProyectileData}, volcan::VolcanoData)
+function PlotGraph(data, volcan::VolcanoData)
     fig = Figure()
     ax = Axis3(
         fig[1, 1],
