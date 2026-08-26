@@ -4,7 +4,7 @@ using GLMakie
 using LinearAlgebra
 using Statistics
 
-export PlotEnergyFigures, energyAnalysis!
+export PlotEnergyFigures
 
 function energyAnalysis!(data)
     # Calcula y guarda la energía cinética en el impacto de cada proyectil.
@@ -23,6 +23,7 @@ function PlotEnergyFigures(
     volcan::VolcanoData,
     output_dir = joinpath(@__DIR__, "..", "data", "output"),
 )
+    energyAnalysis!(data)
     # Se descartan resultados sin energía o sin una posición de impacto válida.
     proyectiles = [
         proyectil for proyectil in data

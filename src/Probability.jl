@@ -2,7 +2,7 @@ module Probability
 using GLMakie #Libreria para graficar en 3d utilizando GPU
 using StaticArrays
 
-export ImpactProbability, PlotImpact
+export PlotImpact
 
 function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float64, xmax::Float64, ymin::Float64, ymax::Float64, nx::Int, ny::Int)
 
@@ -35,16 +35,18 @@ function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64}, xmin::Float
     x_contorno = xmin:dx:xmax
     y_contorno = ymin:dy:ymax
 
-    return n_ij, P_ij, x_contorno, y_contorno
+    return P_ij, x_contorno, y_contorno
 end
 
 function PlotImpact(
-    P_ij::Matrix{Float64},
-    x_contorno,
-    y_contorno,
+    data,
     volcan;
     output_dir = joinpath(@__DIR__, "..", "data", "output"),
 )
+    xp = [p.pos[end][1] for p in data]
+    yp = [p.pos[end][2] for p in data]
+    
+    P_ij, x_contorno, y_contorno = ImpactProbability(xp, yp, -5000.0, 5000.0, -5000.0, 5000.0, 40, 40)
     fig = Figure(size = (1600, 1050), fontsize = 22, backgroundcolor = :white)
     Label(
         fig[0, 1],

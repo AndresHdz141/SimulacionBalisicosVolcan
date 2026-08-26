@@ -23,13 +23,13 @@ function run_test()
 
     #Se genera la informacion del 
     entorno = Environment(
-        altura_crater = 5160.0,
+        altura_crater = 5260.0,
         radio_crater = 300.0,
         velocidad_aire = SVector{3, Float64}(5.0,0.0,0.0)   #m/s
     )
 
     #Se especifican el numero de proyectiles y pasos maximos por dar
-    n_proyectiles = 1000
+    n_proyectiles = 50
     max_steps = 10000
     #Se genera el vector para guardar la informacion de los proyectiles
     all_projectiles_data = Vector{ProyectileData}(undef, n_proyectiles)
@@ -39,12 +39,12 @@ function run_test()
 
         roca = VolcanicProjectile(
             ca = 0.56,
-            rad = rand(0.032:0.005:5.0) ,  #m
+            rad = rand(0.032:0.005:2.5) ,  #m
             dens = rand(2100:2500),  #kg/m^3
             posicion_ini = CraterRandomPos(entorno),     #Altura inicial del proyectil
             v0 = rand(media.Vmin:media.Vmax),          #Magnitud de velocidad inicial del proyectil
             theta =rand(0.0:360.0),         #angulo Horizontal 0 a 360
-            phi = rand(0.0:180)             #angulo vertical 30 a 90
+            phi = rand(35.0:80.0)             #angulo vertical 30 a 90
         )
 
         #Se generan vectores para guardar los datos de posicion, velocidad, aceleracion y tiempo
@@ -93,18 +93,13 @@ function run_test()
     end
     println("Simulación finalizada")
 
-    PlotGraph(all_projectiles_data, volcan)
+    PlotGraph(all_projectiles_data, volcan)     #Simula el volcan y trayectorias en 3D
 
-    xp = [p.pos[end][1] for p in all_projectiles_data]
-    yp = [p.pos[end][2] for p in all_projectiles_data]
-    
-    n_ij, P_ij, x_contorno, y_contorno = ImpactProbability(xp, yp, -5000.0, 5000.0, -5000.0, 5000.0, 40, 40)
+    PlotImpact(all_projectiles_data, volcan)    #Grafica el mapa de probabilidad de impacto
 
-    PlotImpact(P_ij, x_contorno, y_contorno, volcan)
-    energyAnalysis!(all_projectiles_data)
     PlotEnergyFigures(all_projectiles_data, volcan)
     readline()
-    return all_projectiles_data
+    
 end
-all_projectiles_data = run_test()
+run_test()
 
