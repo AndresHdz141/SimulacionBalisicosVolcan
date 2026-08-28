@@ -13,6 +13,9 @@ function PlotGraph(data, volcan::VolcanoData)
         ylabel = "Y (m)",
         zlabel = "Z (m)",
     )
+    valid_heights = filter(z -> !isnan(z) && z > -100.0, volcan.z_matrix)
+    min_elevation = minimum(valid_heights)
+    zlims!(ax, min_elevation,size(volcan.z_matrix, 1) * 15)
 
     for proyectil in data
         scatter!(ax, proyectil.pos, color = :black, alpha = 0.5, markersize = 0.5)

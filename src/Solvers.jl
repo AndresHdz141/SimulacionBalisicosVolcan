@@ -27,10 +27,10 @@ function RK4!(obj::Any, env::Any, dt::Float64)
     obj.acc = aceleracion(obj,env, obj.pos, obj.vel)
 end
 
-function CraterRandomPos(env::Any)
-    x = rand(-env.radio_crater:0.1:env.radio_crater)
-    y = rand(-env.radio_crater:0.1:env.radio_crater)
-    return SVector{3, Float64}(x, y, env.altura_crater)
+function CraterRandomPos(volcan::Any)
+    x = rand(-volcan.radio_crater:0.1:volcan.radio_crater)
+    y = rand(-volcan.radio_crater:0.1:volcan.radio_crater)
+    return SVector{3, Float64}(x, y, volcan.altura_crater)
 
 end
 
@@ -69,9 +69,6 @@ function CheckColisions(particle::Any, VolcanoGrid::Any)
                     (1.0 - dx) * dy         * z01 +
                     dx         * dy         * z11
 
-    #x_shift = trunc(Int, x_shift)
-    #y_shift = trunc(Int, y_shift)
-    #z_mesh = VolcanoGrid.z_matrix[y_shift, x_shift]
     return (z > interpolated_z )
 
 end

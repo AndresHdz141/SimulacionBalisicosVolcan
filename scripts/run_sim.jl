@@ -4,3 +4,10 @@ Pkg.activate(dirname(@__DIR__)) #Se activa el proyect environment para utilizar 
 
 print("Running simulation...")
 
+volcan = volcan...
+datos = simulate_particles(altura_inicial, )
+
+PlotImpact(all_projectiles_data, volcan)    #Grafica el mapa de probabilidad de impacto
+
+PlotEnergyFigures(all_projectiles_data, volcan)
+

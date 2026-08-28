@@ -2,31 +2,7 @@ module Objects
 using StaticArrays
 using TiffImages
 
-export Eruption, debil, media, fuerte,  VolcanicProjectile,ProyectileData, Environment, VolcanoData
-#tipo de erupcion
-struct Eruption
-
-    escenario::String
-
-    Vmin::Float64 #m/s
-
-    Vmax::Float64  #m/s
-
-    max_KE::Float64 #J
-
-    Cantidad_pr::Int #n proyectiles
-
-end
-
-#erupciones-------
-
-const debil = Eruption("debil", 110.0, 150.0, 1.3e6, 1000)
-
-const media = Eruption("media", 120.0, 160.0, 1.0e7, 1000)
-
-const fuerte = Eruption("fuerte", 180.0, 230.0, 8.9e7, 1000)
-
-#----
+export VolcanicProjectile,ProyectileData, Environment, VolcanoData
 
 #Caracteristicas del proyectil - posicion, velocidad en x,y,z | 
 Base.@kwdef mutable struct VolcanicProjectile 
@@ -65,14 +41,7 @@ end
 Base.@kwdef struct Environment #Caracteristicas del ambiente 
     #Añadir caracteristicas importantes - msnm = metros sobre nivel del mar
     
-    altura_crater::Float64     #msnm
-    radio_crater::Float64      #m 
     velocidad_aire::SVector{3, Float64}
-
-    temp_cima::Float64 = -2    #°C
-    temp_int::Float64 = 950    #°C
-    humedad_rel::Float64 = 68  #%
-
     g::SVector{3, Float64} = SVector{3, Float64}(0.0, 0.0, -9.81) #m/s^2
 
     L::Float64 = 0.0065        # K/m
@@ -90,6 +59,8 @@ end
 
 Base.@kwdef struct VolcanoData
     path
+    altura_crater::Float64     #msnm
+    radio_crater::Float64      #m 
     pixel_size::Int64 = 30
     z_matrix::Matrix{Float32} = Float32.(TiffImages.load(path))
     x_coords = (-(size(z_matrix, 2) / 2) * pixel_size):pixel_size:((size(z_matrix, 2) / 2) * pixel_size - 1)
