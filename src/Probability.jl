@@ -4,12 +4,15 @@ using GLMakie #Libreria para graficar en 3d utilizando GPU
 using StaticArrays
 #using Makie.Colors
 using Statistics
+using LinearAlgebra
+
 
 export PlotImpact
 
 function PlotImpact(
     data,
-    volcan;
+    volcan, 
+    resolucion;
     output_dir = joinpath(@__DIR__, "..", "data", "output"),
 )
     isempty(data) && error("No hay impactos para calcular la probabilidad.")
@@ -17,11 +20,15 @@ function PlotImpact(
     xp = [p.pos[end][1] for p in data]
     yp = [p.pos[end][2] for p in data]
 
+    std_x = std(xp)
+    std_y = std(yp)
+    std_data = norm(std_x, std_y)
+    N = length(xp)
+    bandwidth = std_data * N ^ (-1/6)
     half_side = 5000.0
-    grid_points = 180
-    bandwidth = 300.0
-    x_contorno = range(-half_side, half_side; length = grid_points)
-    y_contorno = range(-half_side, half_side; length = grid_points)
+   
+    x_contorno = range(-half_side, half_side; length = resolucion)
+    y_contorno = range(-half_side, half_side; length = resolucion)
 
     # Cada impacto aporta la misma fraccion de probabilidad: 1/N.
     probability_weights = fill(1.0 / length(xp), length(xp))

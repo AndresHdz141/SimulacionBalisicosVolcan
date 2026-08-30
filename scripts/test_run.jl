@@ -33,7 +33,7 @@ function run_test()
     )
 
     #Se especifican el numero de proyectiles y pasos maximos por dar
-    n_proyectiles = 10000
+    n_proyectiles = 500
     max_steps = 10000
     #Se genera el vector para guardar la informacion de los proyectiles
     all_projectiles_data = Vector{ProyectileData}(undef, n_proyectiles)
@@ -98,9 +98,10 @@ function run_test()
     #PlotGraph(all_projectiles_data, volcan)     #Simula el volcan y trayectorias en 3D
     #readline()
     println("Generando graficas...")
-    PlotImpact(all_projectiles_data, volcan)    #Grafica el mapa de probabilidad de impacto
+    resolucion = 500
+    PlotImpact(all_projectiles_data, volcan, resolucion)    #Grafica el mapa de probabilidad de impacto
     println("Mapa de probabilidad de riesgo finalizado")
-    PlotEnergyFigures(all_projectiles_data, volcan)
+    PlotEnergyFigures(all_projectiles_data, volcan,resolucion)
     println("Mapa de energias finalizado")
 
     readline()

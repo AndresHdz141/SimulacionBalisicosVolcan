@@ -21,7 +21,8 @@ end
 
 function PlotEnergyFigures(
     data,
-    volcan::VolcanoData,
+    volcan::VolcanoData,    
+    resolucion = 500,
     output_dir = joinpath(@__DIR__, "..", "data", "output")
 )
     energyAnalysis!(data)
@@ -41,15 +42,18 @@ function PlotEnergyFigures(
 
     x_grid = range(
         -5000, 5000;
-        length = 180,
+        length = resolucion,
     )
 
     y_grid = range(
         -5000, 5000;
-        length = 180,
+        length = resolucion,
     )
-
-    bandwidth = 300.0  # metros
+    std_x = std(x_impacto)
+    std_y = std(y_impacto)
+    std_data = norm(std_x, std_y)
+    N = length(x_impacto)
+    bandwidth = std_data * N ^ (-1/6)
 
     densidad_energia = gaussianKDE2D(
         x_impacto,
