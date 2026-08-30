@@ -3,6 +3,7 @@ include("../src/Objects.jl")
 include("../src/Physics.jl")
 include("../src/Solvers.jl")
 include("../src/DataProcess.jl")
+include("../src/Kernels.jl")
 include("../src/Probability.jl")
 include("../src/Energy.jl")
 
@@ -10,6 +11,7 @@ using .Objects
 using .Physics
 using .Solvers
 using .DataProcess
+using .Kernels
 using .Probability
 using .Energy
 using StaticArrays

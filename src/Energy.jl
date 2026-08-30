@@ -1,5 +1,6 @@
 module Energy
 using ..Objects
+using ..Kernels
 using GLMakie
 using LinearAlgebra
 using Statistics
@@ -21,7 +22,7 @@ end
 function PlotEnergyFigures(
     data,
     volcan::VolcanoData,
-    output_dir = joinpath(@__DIR__, "..", "data", "output"),
+    output_dir = joinpath(@__DIR__, "..", "data", "output")
 )
     energyAnalysis!(data)
     # Se descartan resultados sin energía o sin una posición de impacto válida.
@@ -38,6 +39,30 @@ function PlotEnergyFigures(
 
     energia_mj = [proyectil.EK / 1.0e6 for proyectil in proyectiles] #cambiar J a MJ
 
+    x_grid = range(
+        -5000, 5000;
+        length = 180,
+    )
+
+    y_grid = range(
+        -5000, 5000;
+        length = 180,
+    )
+
+    bandwidth = 300.0  # metros
+
+    densidad_energia = gaussianKDE2D(
+        x_impacto,
+        y_impacto,
+        energia_mj,
+        x_grid,
+        y_grid,
+        bandwidth,
+    )
+
+    # Convertir de MJ/m² a MJ/km²
+    densidad_energia .*= 1.0e6
+
     # Estadísticos principales
     energia_mediana = median(energia_mj)
     energia_p90 = quantile(energia_mj, 0.90)
@@ -46,26 +71,26 @@ function PlotEnergyFigures(
     energia_media = mean(energia_mj)
 
     # Esto se hace para clasificar el tipo de proyectil dependiendo de donde esta en una divicion de percentiles
-    categorias = map(energia_mj) do energia
-        if energia <= energia_mediana
-            1
-        elseif energia <= energia_p90
-            2
-        elseif energia <= energia_p95
-            3
-        else
-            4
-        end
-    end
+    # categorias = map(energia_mj) do energia
+    #     if energia <= energia_mediana
+    #         1
+    #     elseif energia <= energia_p90
+    #         2
+    #     elseif energia <= energia_p95
+    #         3
+    #     else
+    #         4
+    #     end
+    # end
 
-    colores = [:steelblue, :gold, :darkorange, :crimson]
-    tamanos = [10, 13, 17, 22]
-    etiquetas = [
-        "Baja (≤ mediana)",
-        "Media (P50–P90)",
-        "Alta (P90–P95)",
-        "Muy alta (> P95)",
-    ]
+    # colores = [:steelblue, :gold, :darkorange, :crimson]
+    # tamanos = [10, 13, 17, 22]
+    # etiquetas = [
+    #     "Baja (≤ mediana)",
+    #     "Media (P50–P90)",
+    #     "Alta (P90–P95)",
+    #     "Muy alta (> P95)",
+    # ]
 
     mkpath(output_dir)
 
@@ -98,32 +123,59 @@ function PlotEnergyFigures(
         levels = 24,
         colormap = :Greys,
     )
+
     #coloca los proyectiles encima del mapa
-    for categoria in 1:4
-        indices = findall(==(categoria), categorias)
-        scatter!(
-            ax_mapa,
-            x_impacto[indices],
-            y_impacto[indices],
-            color = colores[categoria],
-            markersize = tamanos[categoria],
-            strokecolor = :white,
-            strokewidth = 0.8,
-            label = etiquetas[categoria],
-        )
+    # for categoria in 1:4
+    #     indices = findall(==(categoria), categorias)
+    #     scatter!(
+    #         ax_mapa,
+    #         x_impacto[indices],
+    #         y_impacto[indices],
+    #         color = colores[categoria],
+    #         markersize = tamanos[categoria],
+    #         strokecolor = :white,
+    #         strokewidth = 0.8,
+    #         label = etiquetas[categoria],
+    #     )
+    # end
+
+    # Legend(
+    #     fig_mapa[1, 2],
+    #     ax_mapa,
+    #     "Nivel relativo de energía",
+    #     framevisible = false,
+    # )
+
+    umbral = 0.01 * maximum(densidad_energia)
+
+    densidad_visible = map(densidad_energia) do valor
+        valor < umbral ? NaN : valor
     end
 
-    Legend(
-        fig_mapa[1, 2],
+    # Se muestra la densidad de energia encima de los relieves
+    mapa_energia = contourf!(
         ax_mapa,
-        "Nivel relativo de energía",
-        framevisible = false,
+        x_grid,
+        y_grid,
+        densidad_visible,
+        levels = 20,
+        colormap = :inferno,
+        extendlow = :transparent,
     )
+
+    Colorbar(
+        fig_mapa[1, 2],
+        mapa_energia,
+        label = "Densidad de energía (MJ/km²)",
+    )
+
+    xlims!(ax_mapa, -5000.0, 5000.0)
+    ylims!(ax_mapa, -5000.0, 5000.0)
 
     colgap!(fig_mapa.layout,1,10)
     Label(
         fig_mapa[2, 1],
-        "Clasificación relativa: baja ≤ P50, media P50–P90, alta P90–P95 y muy alta > P95.",
+        "Densidad espacial de energia mediante KDE gaussiano; ancho de banda = $(bandwidth) m ",
         fontsize = 18,
         halign = :center,
     )
@@ -201,7 +253,7 @@ function PlotEnergyFigures(
         justification = :left,
     )
 
-    mapa_path = joinpath(output_dir, "impact_energy_map.png")
+    mapa_path = joinpath(output_dir, "KPE_energy_map.png")
     distribucion_path = joinpath(output_dir, "impact_energy_distribution.png")
     save(mapa_path, fig_mapa, px_per_unit = 2)
     save(distribucion_path, fig_distribucion, px_per_unit = 2)

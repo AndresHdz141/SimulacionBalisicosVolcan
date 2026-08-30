@@ -13,13 +13,13 @@ function RK4!(obj::Any, env::Any, dt::Float64)
     k1x = copy(obj.vel)
     k1v = aceleracion(obj, env, pos0, vel0)
     #k2
-    k2x = obj.vel + 1/2 * k1x * dt
+    k2x = obj.vel + 1/2 * k1v * dt
     k2v = aceleracion(obj, env, pos0 + dt/2 * k1x, vel0 + dt/2 * k1v)
     #k3
-    k3x = obj.vel + 1/2 * k2x * dt
+    k3x = obj.vel + 1/2 * k2v * dt
     k3v = aceleracion(obj, env, pos0 + dt/2 * k2x, vel0 + dt/2 * k2v)
     #k4
-    k4x = obj.vel + k3x * dt
+    k4x = obj.vel + k3v * dt
     k4v = aceleracion(obj, env, pos0 + k3x * dt, vel0 + k3v * dt)
     #Update
     obj.vel = obj.vel + dt/6 * (k1v + 2*k2v + 2k3v + k4v)

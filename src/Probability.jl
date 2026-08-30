@@ -1,60 +1,46 @@
 module Probability
+using ..Kernels
 using GLMakie #Libreria para graficar en 3d utilizando GPU
 using StaticArrays
-using Makie.Colors
+#using Makie.Colors
 using Statistics
 
 export PlotImpact
-
-function ImpactProbability(xp::Vector{Float64}, yp::Vector{Float64},half_side::Float64, nx::Int, ny::Int)
-
-    N = length(xp)
-
-    x_contorno = range(-half_side,half_side, length = nx)
-    y_contorno = range(-half_side,half_side, length = ny)
-
-    dx = step(x_contorno)
-    dy = step(y_contorno)
-
-    n_ij = zeros(Int, nx, ny)
-    fuera_contorno = 0
-
-    for k in 1:N
-        if xp[k] < -half_side || xp[k] >= half_side || yp[k] < -half_side || yp[k] >= half_side
-            fuera_contorno += 1
-            continue
-        end 
-        i = round(Int, (xp[k] - (-half_side))/dx)
-        j = round(Int, (yp[k] - (-half_side))/dy)
-        i = clamp(i, 1, nx)
-        j = clamp(j, 1, ny)
-        n_ij[i, j] += 1
-    end
-
-    if fuera_contorno > 0
-        println("Aviso: ", fuera_contorno, " proyectiles cayeron fuera del contorno de la malla y no se contabilizaron.")
-    end
-
-    P_ij = n_ij ./ N
-
-
-
-    return P_ij, x_contorno, y_contorno
-end
 
 function PlotImpact(
     data,
     volcan;
     output_dir = joinpath(@__DIR__, "..", "data", "output"),
 )
+    isempty(data) && error("No hay impactos para calcular la probabilidad.")
+
     xp = [p.pos[end][1] for p in data]
     yp = [p.pos[end][2] for p in data]
-    
-    P_ij, x_contorno, y_contorno = ImpactProbability(xp, yp, 5000.0, 40, 40)
+
+    half_side = 5000.0
+    grid_points = 180
+    bandwidth = 300.0
+    x_contorno = range(-half_side, half_side; length = grid_points)
+    y_contorno = range(-half_side, half_side; length = grid_points)
+
+    # Cada impacto aporta la misma fraccion de probabilidad: 1/N.
+    probability_weights = fill(1.0 / length(xp), length(xp))
+    densidad_probabilidad = gaussianKDE2D(
+        xp,
+        yp,
+        probability_weights,
+        x_contorno,
+        y_contorno,
+        bandwidth,
+    )
+
+    # Convertir de 1/m² a 1/km².
+    densidad_probabilidad .*= 1.0e6
+
     fig = Figure(size = (1600, 1050), fontsize = 22, backgroundcolor = :white)
     Label(
         fig[0, 1],
-        "Probabilidad de impacto por celda",
+        "Densidad espacial de probabilidad de impacto",
         fontsize = 32,
         font = :bold,
         halign = :center,
@@ -79,17 +65,18 @@ function PlotImpact(
     )
     
     
-    P_plot = map(v -> v == 0.0 ? NaN : v, P_ij)
+    densidad_maxima = maximum(densidad_probabilidad)
+    densidad_maxima > 0 || error("La densidad de probabilidad es cero dentro del area mostrada.")
+    umbral = 0.01 * densidad_maxima
+    P_plot = map(v -> v < umbral ? NaN : v, densidad_probabilidad)
     valores_validos = filter(!isnan, vec(P_plot))
-    #Revisa si esta vacio o no el set, si esta vacio lo llena con 0.05, si no son vacios se calcual el percentil.
-    p95 = isempty(valores_validos) ? 0.005 : quantile(valores_validos, 0.95) 
-    p90 = isempty(valores_validos) ? 0.002 : quantile(valores_validos, 0.90)
-    p50 = isempty(valores_validos) ? 0.001 : quantile(valores_validos, 0.50)
-    p_max =  isempty(valores_validos) ? 1 : maximum(valores_validos)
+    p95 = quantile(valores_validos, 0.95)
+    p90 = quantile(valores_validos, 0.90)
+    p50 = quantile(valores_validos, 0.50)
     P_discreta = map(v -> begin
         if isnan(v)
             return NaN
-        elseif v<p50
+        elseif v < p50
             return 1.0
         elseif v < p90
             return 2.0
@@ -108,7 +95,6 @@ function PlotImpact(
         ]
 
     niveles_discretos = [0.5, 1.5, 2.5, 3.5, 4.5]
-    niveles_continuos = [p50, p90, p95, p_max]
     hm = contourf!(
         ax,
         x_contorno,
@@ -121,12 +107,19 @@ function PlotImpact(
     Colorbar(
         fig[1, 2], 
         hm, 
-        label = "Rangos de Probabilidad por Percentil",
+        label = "Densidad KDE por percentil",
         ticks = ([1.0, 2.0, 3.0, 4.0], ["<50%", "50%-90%", "90%-95%", ">95%"])
     )
     colgap!(fig.layout, 1, 10)
     xlims!(ax, first(x_contorno), last(x_contorno))
     ylims!(ax, first(y_contorno), last(y_contorno))
+
+    Label(
+        fig[2, 1],
+        "KDE gaussiana de probabilidad; ancho de banda = $(bandwidth) m",
+        fontsize = 18,
+        halign = :center,
+    )
 
     mkpath(output_dir)
     prob_map = joinpath(output_dir, "Probability_map.png")
