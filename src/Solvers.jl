@@ -1,6 +1,7 @@
 module Solvers
 using ..Physics
 using StaticArrays
+using LinearAlgebra
 export RK4!, CraterRandomPos, IsInsideVolcanoGrid, CheckColisions, BinarySearch
 #Metodo RK4 
 # obj (sistema a resolver) - velocidad, posicion, masa, etc. \ Struct
@@ -73,15 +74,20 @@ function CheckColisions(particle::Any, VolcanoGrid::Any)
 
 end
 
-function BinarySearch(p_prev, p_next, volcan, it = 100)
-    for _ in 1:it
+function BinarySearch(p_prev, p_next, volcan, it = 100, max_error = 10e-3) 
+    rel_error = norm(p_next - p_prev)
+    i = 1   
+    while (i <= it) && (rel_error > max_error)
     p_mid = p_prev + 0.5 * (p_next - p_prev)
         if CheckColisions((pos = p_mid,), volcan)
             p_prev = p_mid
         else
             p_next = p_mid
         end
+    rel_error = norm(p_prev - p_mid)
+    i+=1
     end
+    println("Error relativo=",rel_error*100, "Num it>", i)
     return 0.5 * (p_prev + p_next)
 
 end
