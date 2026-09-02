@@ -25,7 +25,7 @@ function PlotImpact(
     std_data = norm(std_x, std_y)
     N = length(xp)
     bandwidth = std_data * N ^ (-1/6)
-    half_side = 5000.0
+    half_side = 6500.0
    
     x_contorno = range(-half_side, half_side; length = resolucion)
     y_contorno = range(-half_side, half_side; length = resolucion)
@@ -132,7 +132,6 @@ function PlotImpact(
     prob_map = joinpath(output_dir, "Probability_map.png")
     save(prob_map, fig, px_per_unit = 2)
     println("Mapa de probabilidad guardado en: ", abspath(prob_map))
-    display(fig)
     return fig
 end
 end

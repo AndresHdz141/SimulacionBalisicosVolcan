@@ -15,7 +15,8 @@ using .Kernels
 using .Probability
 using .Energy
 using StaticArrays
-
+using Random
+using Distributions
 
 #Funcion para la prueba
 function run_test() 
@@ -33,19 +34,22 @@ function run_test()
     )
 
     #Se especifican el numero de proyectiles y pasos maximos por dar
-    n_proyectiles = 500
+    n_proyectiles = 10000
     max_steps = 10000
     #Se genera el vector para guardar la informacion de los proyectiles
     all_projectiles_data = Vector{ProyectileData}(undef, n_proyectiles)
+
+    #Generar distribucion normal de radios
+    radios_distribucion = LogNormal(log(0.3), 0.7)
 
     for i ∈ 1:n_proyectiles
         #Se genera un proyectil con Caracteristicas, posicion y velocidad.
         roca = VolcanicProjectile(
             ca = 0.56,  
-            rad = rand(0.032:0.005:2.5) ,               #m --> Realizar distribucion de probabilidades para los radios posibles (investigar)
+            rad = rand(radios_distribucion) ,               #m --> Realizar distribucion de probabilidades para los radios posibles (investigar)
             dens = rand(2100:2500),                     #kg/m^3 --> Distribucion estadistica
             posicion_ini = CraterRandomPos(volcan),     #Altura inicial del proyectil              >>>
-            v0 = rand(100.0:150.0),          #Magnitud de velocidad inicial del proyectil >>>
+            v0 = rand(100.0:250.0),          #Magnitud de velocidad inicial del proyectil >>>
             theta =rand(0.0:360.0),         #angulo Horizontal 0 a 360 -
             phi = rand(25.0:85.0)             #angulo vertical 30 a 90 -
         )
@@ -91,13 +95,13 @@ function run_test()
         resize!(acc_history, step)
         #join position, velocity and acceleration into a vector
         all_projectiles_data[i] = ProyectileData(i, roca.masa, pos_history, vel_history, acc_history, NaN)
-
+        println("Diametro>... ", roca.rad*2)
         println("[",i,"]_Simulando...")
     end
     println("Simulación finalizada")
-    #PlotGraph(all_projectiles_data, volcan)     #Simula el volcan y trayectorias en 3D
-    #readline()
-    println("Generando graficas...")
+    println("Generando Graficas")
+    PlotGraph(all_projectiles_data, volcan)     #Simula el volcan y trayectorias en 3D
+    println("Grafica 3D generada")
     resolucion = 500
     PlotImpact(all_projectiles_data, volcan, resolucion)    #Grafica el mapa de probabilidad de impacto
     println("Mapa de probabilidad de riesgo finalizado")

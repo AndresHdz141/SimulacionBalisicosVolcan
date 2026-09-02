@@ -41,12 +41,12 @@ function PlotEnergyFigures(
     energia_mj = [proyectil.EK / 1.0e6 for proyectil in proyectiles] #cambiar J a MJ
 
     x_grid = range(
-        -5000, 5000;
+        -6500, 6500;
         length = resolucion,
     )
 
     y_grid = range(
-        -5000, 5000;
+        -6500, 6500;
         length = resolucion,
     )
     std_x = std(x_impacto)
@@ -73,6 +73,7 @@ function PlotEnergyFigures(
     energia_p95 = quantile(energia_mj, 0.95)
     energia_maxima = maximum(energia_mj)
     energia_media = mean(energia_mj)
+    energia_desvest = std(energia_mj)
 
     # Esto se hace para clasificar el tipo de proyectil dependiendo de donde esta en una divicion de percentiles
     # categorias = map(energia_mj) do energia
@@ -173,8 +174,8 @@ function PlotEnergyFigures(
         label = "Densidad de energía (MJ/km²)",
     )
 
-    xlims!(ax_mapa, -5000.0, 5000.0)
-    ylims!(ax_mapa, -5000.0, 5000.0)
+    xlims!(ax_mapa, -6500.0, 6500.0)
+    ylims!(ax_mapa, -6500.0, 6500.0)
 
     colgap!(fig_mapa.layout,1,10)
     Label(
@@ -184,6 +185,8 @@ function PlotEnergyFigures(
         halign = :center,
     )
 
+    #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    # FIGURA DE DISTRIBUCION DE ENERGIAS
     # histograma y resumen estadístico
     fig_distribucion = Figure(size = (1500, 900), fontsize = 22, backgroundcolor = :white)
     Label(
@@ -202,7 +205,7 @@ function PlotEnergyFigures(
     )
 
     # Se usa un número de intervalos proporcional a la raíz del total de datos.
-    numero_bins = clamp(round(Int, sqrt(length(energia_mj))), 12, 60)
+    numero_bins = clamp(round(Int, length(energia_mj)), 12, 60)
     hist!(
         ax_histograma,
         energia_mj,
@@ -240,6 +243,7 @@ function PlotEnergyFigures(
             "P90: $(round(energia_p90, sigdigits = 4)) MJ",
             "P95: $(round(energia_p95, sigdigits = 4)) MJ",
             "Máxima: $(round(energia_maxima, sigdigits = 4)) MJ",
+            "Desv. Est.: $(round(energia_desvest, sigdigits = 4)) MJ",
             "",
             "P95: 95 % de los impactos queda",
             "por debajo de este valor y 5 % lo supera.",
